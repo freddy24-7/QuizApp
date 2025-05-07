@@ -8,9 +8,13 @@ import java.util.List;
 
 @Data
 public class QuestionDTO {
+
+    private Long id;
+
     @NotBlank
     private String text;
 
     @NotEmpty
     private List<AnswerOptionDTO> options;
+
 }

@@ -8,6 +8,9 @@ import java.util.List;
 
 @Data
 public class QuizDTO {
+
+    private Long id;
+
     @NotBlank
     private String title;
 

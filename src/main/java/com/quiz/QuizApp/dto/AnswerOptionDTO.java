@@ -5,6 +5,9 @@ import lombok.Data;
 
 @Data
 public class AnswerOptionDTO {
+
+    private Long id;
+
     @NotBlank
     private String text;
 

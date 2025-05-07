@@ -47,14 +47,17 @@ public class QuizMapper {
 
     public static QuizDTO toDto(Quiz quiz) {
         QuizDTO dto = new QuizDTO();
+        dto.setId(quiz.getId());
         dto.setTitle(quiz.getTitle());
 
         List<QuestionDTO> questionDTOs = quiz.getQuestions().stream().map(q -> {
             QuestionDTO qDto = new QuestionDTO();
+            qDto.setId(q.getId());
             qDto.setText(q.getText());
 
             List<AnswerOptionDTO> optionDTOs = q.getOptions().stream().map(opt -> {
                 AnswerOptionDTO optDto = new AnswerOptionDTO();
+                optDto.setId(opt.getId());
                 optDto.setText(opt.getText());
                 optDto.setCorrect(opt.isCorrect());
                 return optDto;
@@ -69,6 +72,7 @@ public class QuizMapper {
         if (quiz.getParticipants() != null) {
             List<ParticipantDTO> participantDTOs = quiz.getParticipants().stream().map(p -> {
                 ParticipantDTO pDto = new ParticipantDTO();
+                pDto.setId(p.getId());
                 pDto.setPhoneNumber(p.getPhoneNumber());
                 return pDto;
             }).collect(Collectors.toList());
@@ -86,6 +90,5 @@ public class QuizMapper {
         dto.setParticipantCount(quiz.getParticipants() != null ? quiz.getParticipants().size() : 0);
         return dto;
     }
-
 
 }
