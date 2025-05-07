@@ -2,10 +2,14 @@ package com.quiz.QuizApp.controllers;
 
 import com.quiz.QuizApp.domain.*;
 import com.quiz.QuizApp.dto.*;
+import com.quiz.QuizApp.mapper.QuizMapper;
 import com.quiz.QuizApp.service.QuizService;
 import jakarta.validation.Valid;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -25,14 +29,16 @@ public class QuizController {
     }
 
     @GetMapping
-    public List<Quiz> getAll() {
-        return quizService.getAllQuizzes();
+    public List<QuizDTO> getAll() {
+        return quizService.getAllQuizzes().stream()
+                .map(QuizMapper::toDto)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Quiz> getOne(@PathVariable Long id) {
+    public ResponseEntity<QuizDTO> getOne(@PathVariable Long id) {
         Quiz quiz = quizService.getQuizById(id);
-        return quiz != null ? ResponseEntity.ok(quiz) : ResponseEntity.notFound().build();
+        return quiz != null ? ResponseEntity.ok(QuizMapper.toDto(quiz)) : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
@@ -45,6 +51,12 @@ public class QuizController {
     public ResponseEntity<Void> deleteQuiz(@PathVariable Long id) {
         boolean deleted = quizService.deleteQuiz(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/summaries")
+    public Page<QuizSummaryDTO> getSummaries(@PageableDefault(size = 5) Pageable pageable) {
+        return quizService.getQuizPage(pageable)
+                .map(QuizMapper::toSummaryDto);
     }
 
 }
