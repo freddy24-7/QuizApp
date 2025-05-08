@@ -47,18 +47,22 @@ public class ResponseService {
             }
         }
 
+        saveOrUpdateResponse(dto.getUsername(), participant, question, dto.getSelectedAnswer());
+        return ResponseEntity.ok("Response submitted (or updated) successfully");
+    }
+
+    @Transactional
+    public void saveOrUpdateResponse(String username, Participant participant, Question question, String selectedAnswer) {
         Response response = responseRepo
                 .findByParticipant_IdAndQuestion_Id(participant.getId(), question.getId())
                 .orElse(new Response());
 
-        response.setUsername(dto.getUsername());
+        response.setUsername(username);
         response.setParticipant(participant);
         response.setQuestion(question);
-        response.setSelectedAnswer(dto.getSelectedAnswer());
+        response.setSelectedAnswer(selectedAnswer);
 
         responseRepo.save(response);
-
-        return ResponseEntity.ok("Response submitted (or updated) successfully");
     }
 
     @Transactional
@@ -84,7 +88,6 @@ public class ResponseService {
                     .orElse(false);
 
             scores.put(username, scores.getOrDefault(username, 0) + (isCorrect ? 1 : 0));
-
             String timestamp = response.getCreatedAt() != null ? response.getCreatedAt().format(formatter) : "";
             latestTimestamps.put(username, timestamp);
         }
@@ -111,7 +114,6 @@ public class ResponseService {
 
         Quiz quiz = quizOpt.get();
         int totalQuestions = quiz.getQuestions().size();
-
         List<Response> allResponses = responseRepo.findByParticipant_Quiz_Id(quizId);
         List<Map<String, Object>> progressList = new ArrayList<>();
 
