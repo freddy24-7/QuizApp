@@ -1,5 +1,8 @@
 package com.quiz.QuizApp.websocket;
 
+import org.springframework.lang.NonNull;
+import org.springframework.messaging.simp.stomp.StompFrameHandler;
+import org.springframework.messaging.simp.stomp.StompHeaders;
 import com.quiz.QuizApp.domain.*;
 import com.quiz.QuizApp.repository.QuizRepository;
 import org.junit.jupiter.api.Test;
@@ -77,9 +80,16 @@ class QuizWebSocketIntegrationTest {
 
         // 4) Subscribe to the real-time scoreboard
         session.subscribe(SUBSCRIBE_DEST + quizId, new StompFrameHandler() {
-            @Override public Type getPayloadType(StompHeaders headers) { return Object.class; }
-            @Override public void handleFrame(StompHeaders headers, Object payload) {
-                messages.offer(payload);
+            @Override
+            @NonNull
+            public Type getPayloadType(@NonNull StompHeaders headers) {
+                return Object.class;
+            }
+
+            @Override
+            @NonNull
+            public void handleFrame(@NonNull StompHeaders headers, @NonNull Object payload) {
+                messages.add(payload);
             }
         });
 
