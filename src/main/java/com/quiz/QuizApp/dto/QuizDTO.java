@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -13,6 +14,12 @@ public class QuizDTO {
 
     @NotBlank
     private String title;
+
+    private Integer durationInSeconds;
+
+    private LocalDateTime startTime;
+
+    private Boolean closed;
 
     @NotEmpty
     private List<QuestionDTO> questions;
