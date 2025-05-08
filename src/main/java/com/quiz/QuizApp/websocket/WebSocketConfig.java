@@ -12,7 +12,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/quiz-websocket").setAllowedOrigins("*").withSockJS();
+        registry
+                .addEndpoint("/ws")
+                .setAllowedOrigins("*");
     }
 
     @Override

@@ -37,10 +37,7 @@ public class QuizWebSocketController {
         }
 
         // 2. Find question
-        Question question = questionRepo.findById(submission.getQuestionId()).orElse(null);
-        if (question == null) {
-            return;
-        }
+        Question question = questionRepo.findWithOptionsById(submission.getQuestionId()).orElse(null);
 
         // 3. Save response
         Response response = new Response();
