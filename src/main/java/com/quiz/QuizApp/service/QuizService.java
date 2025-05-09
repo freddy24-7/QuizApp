@@ -1,13 +1,14 @@
 package com.quiz.QuizApp.service;
 
-import com.quiz.QuizApp.domain.*;
-import com.quiz.QuizApp.dto.*;
+import com.quiz.QuizApp.domain.Quiz;
+import com.quiz.QuizApp.dto.QuizDTO;
 import com.quiz.QuizApp.mapper.QuizMapper;
 import com.quiz.QuizApp.repository.QuizRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -23,10 +24,14 @@ public class QuizService {
         return quizRepo.save(QuizMapper.fromDto(dto));
     }
 
-    public List<Quiz> getAllQuizzes() {
-        return quizRepo.findAll();
+    @Transactional(readOnly = true)
+    public List<QuizDTO> getAllQuizzes() {
+        return quizRepo.findAll().stream()
+                .map(QuizMapper::toDto)
+                .toList();
     }
 
+    @Transactional(readOnly = true)
     public Quiz getQuizById(Long id) {
         return quizRepo.findById(id).orElse(null);
     }
@@ -44,8 +49,8 @@ public class QuizService {
         return true;
     }
 
+    @Transactional(readOnly = true)
     public Page<Quiz> getQuizPage(Pageable pageable) {
         return quizRepo.findAll(pageable);
     }
-
 }

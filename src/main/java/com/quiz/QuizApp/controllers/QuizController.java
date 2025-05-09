@@ -30,9 +30,7 @@ public class QuizController {
 
     @GetMapping
     public List<QuizDTO> getAll() {
-        return quizService.getAllQuizzes().stream()
-                .map(QuizMapper::toDto)
-                .toList();
+        return quizService.getAllQuizzes();
     }
 
     @GetMapping("/{id}")
