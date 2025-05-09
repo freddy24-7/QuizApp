@@ -35,8 +35,8 @@ public class QuizController {
 
     @GetMapping("/{id}")
     public ResponseEntity<QuizDTO> getOne(@PathVariable Long id) {
-        Quiz quiz = quizService.getQuizById(id);
-        return quiz != null ? ResponseEntity.ok(QuizMapper.toDto(quiz)) : ResponseEntity.notFound().build();
+        QuizDTO dto = quizService.getQuizById(id);
+        return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")

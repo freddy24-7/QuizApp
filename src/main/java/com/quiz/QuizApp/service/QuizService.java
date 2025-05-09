@@ -32,8 +32,10 @@ public class QuizService {
     }
 
     @Transactional(readOnly = true)
-    public Quiz getQuizById(Long id) {
-        return quizRepo.findById(id).orElse(null);
+    public QuizDTO getQuizById(Long id) {
+        return quizRepo.findById(id)
+                .map(QuizMapper::toDto)
+                .orElse(null);
     }
 
     public Quiz updateQuiz(Long id, QuizDTO dto) {
