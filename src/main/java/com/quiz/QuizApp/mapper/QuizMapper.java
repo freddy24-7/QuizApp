@@ -48,6 +48,7 @@ public class QuizMapper {
 
     public static QuizDTO toDto(Quiz quiz) {
         QuizDTO dto = new QuizDTO();
+        dto.setId(quiz.getId()); // ✅ Add this
         dto.setTitle(quiz.getTitle());
         dto.setDurationInSeconds(quiz.getDurationInSeconds());
         dto.setStartTime(quiz.getStartTime());
@@ -55,10 +56,12 @@ public class QuizMapper {
 
         List<QuestionDTO> questionDTOs = quiz.getQuestions().stream().map(q -> {
             QuestionDTO qDto = new QuestionDTO();
+            qDto.setId(q.getId()); // ✅ Add this
             qDto.setText(q.getText());
 
             List<AnswerOptionDTO> optionDTOs = q.getOptions().stream().map(opt -> {
                 AnswerOptionDTO optDto = new AnswerOptionDTO();
+                optDto.setId(opt.getId()); // ✅ Add this
                 optDto.setText(opt.getText());
                 optDto.setCorrect(opt.isCorrect());
                 return optDto;
@@ -73,6 +76,7 @@ public class QuizMapper {
         if (quiz.getParticipants() != null) {
             List<ParticipantDTO> participantDTOs = quiz.getParticipants().stream().map(p -> {
                 ParticipantDTO pDto = new ParticipantDTO();
+                pDto.setId(p.getId()); // ✅ Add this
                 pDto.setPhoneNumber(p.getPhoneNumber());
                 return pDto;
             }).collect(Collectors.toList());
@@ -81,6 +85,7 @@ public class QuizMapper {
 
         return dto;
     }
+
 
     public static QuizSummaryDTO toSummaryDto(Quiz quiz) {
         QuizSummaryDTO dto = new QuizSummaryDTO();
