@@ -1,7 +1,7 @@
 package com.quiz.QuizApp.controllers;
 
-import com.quiz.QuizApp.domain.*;
-import com.quiz.QuizApp.dto.*;
+import com.quiz.QuizApp.dto.QuizDTO;
+import com.quiz.QuizApp.dto.QuizSummaryDTO;
 import com.quiz.QuizApp.mapper.QuizMapper;
 import com.quiz.QuizApp.service.QuizService;
 import jakarta.validation.Valid;
@@ -24,8 +24,9 @@ public class QuizController {
     }
 
     @PostMapping
-    public ResponseEntity<Quiz> createQuiz(@Valid @RequestBody QuizDTO dto) {
-        return ResponseEntity.ok(quizService.createQuiz(dto));
+    public ResponseEntity<QuizDTO> createQuiz(@Valid @RequestBody QuizDTO dto) {
+        var created = quizService.createQuiz(dto);
+        return ResponseEntity.ok(QuizMapper.toDto(created));
     }
 
     @GetMapping
@@ -40,9 +41,9 @@ public class QuizController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Quiz> updateQuiz(@PathVariable Long id, @Valid @RequestBody QuizDTO dto) {
-        Quiz updated = quizService.updateQuiz(id, dto);
-        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    public ResponseEntity<QuizDTO> updateQuiz(@PathVariable Long id, @Valid @RequestBody QuizDTO dto) {
+        var updated = quizService.updateQuiz(id, dto);
+        return updated != null ? ResponseEntity.ok(QuizMapper.toDto(updated)) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
@@ -56,5 +57,4 @@ public class QuizController {
         return quizService.getQuizPage(pageable)
                 .map(QuizMapper::toSummaryDto);
     }
-
 }
