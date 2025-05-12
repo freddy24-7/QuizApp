@@ -73,7 +73,7 @@ public class ResponseService {
     }
 
     public ResponseEntity<?> getResults(Long quizId, int page, int size) {
-        var responses = responseRepo.findByParticipant_Quiz_Id(quizId);
+        List<Response> responses = responseRepo.findByParticipant_Quiz_IdWithOptions(quizId);
 
         Map<String, Integer> scores = new HashMap<>();
         Map<String, String> latestTimestamps = new HashMap<>();
