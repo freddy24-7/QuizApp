@@ -83,35 +83,53 @@ public class ResponseService {
     public ResponseEntity<?> getResults(Long quizId, int page, int size) {
         List<Response> responses = responseRepo.findByParticipant_Quiz_IdWithOptions(quizId);
 
-        Map<String, Integer> scores = new HashMap<>();
-        Map<String, String> latestTimestamps = new HashMap<>();
+        Map<String, Map<String, Object>> userDataMap = new HashMap<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         for (Response response : responses) {
             String username = response.getUsername();
+            Long participantId = response.getParticipant().getId();
+            Long qId = response.getQuestion().getId();
+            Long quizID = response.getQuiz().getId();
+
             boolean isCorrect = response.getQuestion().getOptions().stream()
                     .filter(opt -> opt.getText().equals(response.getSelectedAnswer()))
                     .findFirst()
                     .map(AnswerOption::isCorrect)
                     .orElse(false);
 
-            scores.put(username, scores.getOrDefault(username, 0) + (isCorrect ? 1 : 0));
-            String timestamp = response.getCreatedAt() != null ? response.getCreatedAt().format(formatter) : "";
-            latestTimestamps.put(username, timestamp);
+            Map<String, Object> userData = userDataMap.getOrDefault(username, new HashMap<>());
+
+            userData.putIfAbsent("username", username);
+            userData.putIfAbsent("participantId", participantId);
+            userData.putIfAbsent("quizId", quizID);
+            userData.put("score", (int) userData.getOrDefault("score", 0) + (isCorrect ? 1 : 0));
+
+            // ✅ Safe cast for Set<Long>
+            @SuppressWarnings("unchecked")
+            Set<Long> questionIds = (Set<Long>) userData.computeIfAbsent("questionIds", k -> new HashSet<Long>());
+            questionIds.add(qId);
+
+            // Track latest submission time
+            LocalDateTime createdAt = response.getCreatedAt();
+            String formattedTime = createdAt != null ? createdAt.format(formatter) : "";
+            String existingTime = (String) userData.getOrDefault("lastSubmittedAt", "");
+
+            if (existingTime.isEmpty() || formattedTime.compareTo(existingTime) > 0) {
+                userData.put("lastSubmittedAt", formattedTime);
+            }
+
+            userDataMap.put(username, userData);
         }
 
-        List<Map<String, Object>> sortedResults = scores.entrySet().stream()
-                .map(entry -> {
-                    Map<String, Object> result = new HashMap<>();
-                    result.put("username", entry.getKey());
-                    result.put("score", entry.getValue());
-                    result.put("lastSubmittedAt", latestTimestamps.get(entry.getKey()));
-                    return result;
-                })
-                .sorted((a, b) -> ((Integer) b.get("score")).compareTo((Integer) a.get("score")))
-                .toList();
+        // Convert to list and flatten questionIds
+        List<Map<String, Object>> enrichedResults = userDataMap.values().stream().peek(data ->
+                data.put("questionIds", new ArrayList<>((Set<Long>) data.get("questionIds")))
+        ).sorted((a, b) ->
+                ((Integer) b.get("score")).compareTo((Integer) a.get("score"))
+        ).toList();
 
-        return paginateResults(sortedResults, page, size, "results");
+        return paginateResults(enrichedResults, page, size, "results");
     }
 
     public ResponseEntity<?> getProgress(Long quizId, int page, int size) {
