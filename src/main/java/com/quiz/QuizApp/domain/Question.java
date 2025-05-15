@@ -22,6 +22,7 @@ public class Question {
     private String text;
 
     @ManyToOne
+    @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)

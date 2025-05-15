@@ -31,7 +31,14 @@ public class ResponseService {
         if (participant == null) return ResponseEntity.badRequest().body("Invalid participant phone number");
 
         Question question = questionRepo.findById(dto.getQuestionId()).orElse(null);
-        if (question == null) return ResponseEntity.badRequest().body("Invalid question ID");
+        if (question == null) {
+            return ResponseEntity.badRequest().body("Invalid question ID");
+        }
+
+        // ✅ Validate that the question belongs to the submitted quiz
+        if (!question.getQuiz().getId().equals(dto.getQuizId())) {
+            return ResponseEntity.badRequest().body("Mismatch: The question does not belong to the provided quiz.");
+        }
 
         Quiz quiz = question.getQuiz();
         if (quiz.isClosed()) {

@@ -19,4 +19,7 @@ public interface ResponseRepository extends JpaRepository<Response, Long> {
             "JOIN FETCH q.options " +
             "WHERE r.participant.quiz.id = :quizId")
     List<Response> findByParticipant_Quiz_IdWithOptions(@Param("quizId") Long quizId);
+
+    void deleteAllByParticipantIdIn(List<Long> participantIds);
+
 }

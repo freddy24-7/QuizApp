@@ -1,10 +1,12 @@
 package com.quiz.QuizApp.service;
 
+import com.quiz.QuizApp.domain.Participant;
 import com.quiz.QuizApp.domain.Quiz;
 import com.quiz.QuizApp.dto.QuizDTO;
 import com.quiz.QuizApp.mapper.QuizMapper;
 import com.quiz.QuizApp.repository.ParticipantRepository;
 import com.quiz.QuizApp.repository.QuizRepository;
+import com.quiz.QuizApp.repository.ResponseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,10 +19,16 @@ public class QuizService {
 
     private final QuizRepository quizRepo;
     private final ParticipantRepository participantRepo;
+    private final ResponseRepository responseRepo;
 
-    public QuizService(QuizRepository quizRepo, ParticipantRepository participantRepo) {
+    public QuizService(
+            QuizRepository quizRepo,
+            ParticipantRepository participantRepo,
+            ResponseRepository responseRepo
+    ) {
         this.quizRepo = quizRepo;
         this.participantRepo = participantRepo;
+        this.responseRepo = responseRepo;
     }
 
     public Quiz createQuiz(QuizDTO dto) {
@@ -51,13 +59,22 @@ public class QuizService {
     @Transactional
     public boolean deleteQuiz(Long id) {
         if (!quizRepo.existsById(id)) return false;
+
+        var participantIds = participantRepo.findByQuiz_Id(id)
+                .stream()
+                .map(Participant::getId)
+                .toList();
+
+        responseRepo.deleteAllByParticipantIdIn(participantIds);
         participantRepo.deleteAllByQuiz_Id(id);
         quizRepo.deleteById(id);
+
         return true;
     }
 
     @Transactional
     public void deleteAllQuizzes() {
+        responseRepo.deleteAll();
         participantRepo.deleteAll();
         quizRepo.deleteAll();
     }
