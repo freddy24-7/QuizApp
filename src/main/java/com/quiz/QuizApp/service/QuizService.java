@@ -51,15 +51,15 @@ public class QuizService {
     @Transactional
     public boolean deleteQuiz(Long id) {
         if (!quizRepo.existsById(id)) return false;
-        participantRepo.deleteAllByQuiz_Id(id);  // Delete participants first
-        quizRepo.deleteById(id);                // Then delete quiz
+        participantRepo.deleteAllByQuiz_Id(id);
+        quizRepo.deleteById(id);
         return true;
     }
 
     @Transactional
     public void deleteAllQuizzes() {
-        participantRepo.deleteAll();  // Delete all participants first
-        quizRepo.deleteAll();         // Then delete all quizzes
+        participantRepo.deleteAll();
+        quizRepo.deleteAll();
     }
 
     @Transactional(readOnly = true)

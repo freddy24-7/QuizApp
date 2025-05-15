@@ -21,7 +21,5 @@ public class Participant {
     private String phoneNumber;
 
     @ManyToOne
-    @JoinColumn(name = "quiz_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Quiz quiz;
 }
