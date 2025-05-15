@@ -1,13 +1,12 @@
 package com.quiz.QuizApp.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Data
 @NoArgsConstructor
@@ -22,5 +21,7 @@ public class Participant {
     private String phoneNumber;
 
     @ManyToOne
+    @JoinColumn(name = "quiz_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Quiz quiz;
 }
