@@ -3,6 +3,7 @@ package com.quiz.QuizApp.service;
 import com.quiz.QuizApp.domain.Quiz;
 import com.quiz.QuizApp.dto.QuizDTO;
 import com.quiz.QuizApp.mapper.QuizMapper;
+import com.quiz.QuizApp.repository.ParticipantRepository;
 import com.quiz.QuizApp.repository.QuizRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,9 +16,11 @@ import java.util.List;
 public class QuizService {
 
     private final QuizRepository quizRepo;
+    private final ParticipantRepository participantRepo;
 
-    public QuizService(QuizRepository quizRepo) {
+    public QuizService(QuizRepository quizRepo, ParticipantRepository participantRepo) {
         this.quizRepo = quizRepo;
+        this.participantRepo = participantRepo;
     }
 
     public Quiz createQuiz(QuizDTO dto) {
@@ -45,17 +48,19 @@ public class QuizService {
         return quizRepo.save(quiz);
     }
 
+    @Transactional
     public boolean deleteQuiz(Long id) {
         if (!quizRepo.existsById(id)) return false;
-        quizRepo.deleteById(id);
+        participantRepo.deleteAllByQuiz_Id(id);  // Delete participants first
+        quizRepo.deleteById(id);                // Then delete quiz
         return true;
     }
 
     @Transactional
     public void deleteAllQuizzes() {
-        quizRepo.deleteAll();
+        participantRepo.deleteAll();  // Delete all participants first
+        quizRepo.deleteAll();         // Then delete all quizzes
     }
-
 
     @Transactional(readOnly = true)
     public Page<Quiz> getQuizPage(Pageable pageable) {
