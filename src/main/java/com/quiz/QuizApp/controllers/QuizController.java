@@ -57,4 +57,11 @@ public class QuizController {
         return quizService.getQuizPage(pageable)
                 .map(QuizMapper::toSummaryDto);
     }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteAllQuizzes() {
+        quizService.deleteAllQuizzes();
+        return ResponseEntity.ok("All quizzes have been deleted.");
+    }
+
 }

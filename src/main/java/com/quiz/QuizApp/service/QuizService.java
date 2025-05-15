@@ -51,6 +51,12 @@ public class QuizService {
         return true;
     }
 
+    @Transactional
+    public void deleteAllQuizzes() {
+        quizRepo.deleteAll();
+    }
+
+
     @Transactional(readOnly = true)
     public Page<Quiz> getQuizPage(Pageable pageable) {
         return quizRepo.findAll(pageable);
