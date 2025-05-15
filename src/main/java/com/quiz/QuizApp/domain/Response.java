@@ -8,11 +8,12 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class Response {
+
     @Id
     @GeneratedValue
     private Long id;
@@ -24,10 +25,16 @@ public class Response {
     private String username;
 
     @ManyToOne
+    @JoinColumn(name = "participant_id", nullable = false)
     private Participant participant;
 
     @ManyToOne
+    @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
     private String selectedAnswer;
+
+    @ManyToOne
+    @JoinColumn(name = "quiz_id", nullable = false)
+    private Quiz quiz;
 }

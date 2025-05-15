@@ -68,6 +68,7 @@ public class ResponseService {
         response.setParticipant(participant);
         response.setQuestion(question);
         response.setSelectedAnswer(selectedAnswer);
+        response.setQuiz(question.getQuiz());
 
         responseRepo.save(response);
     }
