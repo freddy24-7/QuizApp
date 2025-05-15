@@ -1,8 +1,0 @@
--- Add quiz_id column to response table
-ALTER TABLE response
-ADD COLUMN quiz_id BIGINT NOT NULL;
-
--- Add foreign key constraint to quiz table
-ALTER TABLE response
-ADD CONSTRAINT fk_response_quiz
-FOREIGN KEY (quiz_id) REFERENCES quiz(id);
