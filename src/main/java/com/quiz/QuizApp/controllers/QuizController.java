@@ -60,7 +60,7 @@ public class QuizController {
 
     @DeleteMapping
     public ResponseEntity<String> deleteAllQuizzes() {
-        quizService.deleteAllQuizzes();  // Correct: delegate fully to service
+        quizService.deleteAllQuizzes();
         return ResponseEntity.ok("All quizzes have been deleted.");
     }
 
