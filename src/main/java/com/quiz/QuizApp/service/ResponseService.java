@@ -35,7 +35,6 @@ public class ResponseService {
             return ResponseEntity.badRequest().body("Invalid question ID");
         }
 
-        // ✅ Validate that the question belongs to the submitted quiz
         if (!question.getQuiz().getId().equals(dto.getQuizId())) {
             return ResponseEntity.badRequest().body("Mismatch: The question does not belong to the provided quiz.");
         }
@@ -81,16 +80,21 @@ public class ResponseService {
     }
 
     public ResponseEntity<?> getResults(Long quizId, int page, int size) {
-        List<Response> responses = responseRepo.findByParticipant_Quiz_IdWithOptions(quizId);
+        List<Response> responses = responseRepo.findByQuiz_IdWithOptions(quizId);
 
         Map<String, Map<String, Object>> userDataMap = new HashMap<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         for (Response response : responses) {
-            String username = response.getUsername();
             Long participantId = response.getParticipant().getId();
+            Long currentQuizId = response.getQuiz().getId();
+
+            String key = participantId + "_" + currentQuizId;
+
+            Map<String, Object> userData = userDataMap.getOrDefault(key, new HashMap<>());
+
+            String username = response.getUsername();
             Long qId = response.getQuestion().getId();
-            Long quizID = response.getQuiz().getId();
 
             boolean isCorrect = response.getQuestion().getOptions().stream()
                     .filter(opt -> opt.getText().equals(response.getSelectedAnswer()))
@@ -98,19 +102,15 @@ public class ResponseService {
                     .map(AnswerOption::isCorrect)
                     .orElse(false);
 
-            Map<String, Object> userData = userDataMap.getOrDefault(username, new HashMap<>());
-
             userData.putIfAbsent("username", username);
             userData.putIfAbsent("participantId", participantId);
-            userData.putIfAbsent("quizId", quizID);
+            userData.putIfAbsent("quizId", currentQuizId);
             userData.put("score", (int) userData.getOrDefault("score", 0) + (isCorrect ? 1 : 0));
 
-            // ✅ Safe cast for Set<Long>
             @SuppressWarnings("unchecked")
             Set<Long> questionIds = (Set<Long>) userData.computeIfAbsent("questionIds", k -> new HashSet<Long>());
             questionIds.add(qId);
 
-            // Track latest submission time
             LocalDateTime createdAt = response.getCreatedAt();
             String formattedTime = createdAt != null ? createdAt.format(formatter) : "";
             String existingTime = (String) userData.getOrDefault("lastSubmittedAt", "");
@@ -119,10 +119,9 @@ public class ResponseService {
                 userData.put("lastSubmittedAt", formattedTime);
             }
 
-            userDataMap.put(username, userData);
+            userDataMap.put(key, userData);
         }
 
-        // Convert to list and flatten questionIds
         List<Map<String, Object>> enrichedResults = userDataMap.values().stream().peek(data ->
                 data.put("questionIds", new ArrayList<>((Set<Long>) data.get("questionIds")))
         ).sorted((a, b) ->
