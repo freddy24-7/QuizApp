@@ -2,7 +2,9 @@ package com.quiz.QuizApp.controllers;
 
 import com.quiz.QuizApp.dto.QuizDTO;
 import com.quiz.QuizApp.dto.QuizSummaryDTO;
+import com.quiz.QuizApp.domain.Quiz;
 import com.quiz.QuizApp.mapper.QuizMapper;
+import com.quiz.QuizApp.service.QuizInviteService;
 import com.quiz.QuizApp.service.QuizService;
 import jakarta.validation.Valid;
 import org.springframework.data.web.PageableDefault;
@@ -18,14 +20,20 @@ import java.util.List;
 public class QuizController {
 
     private final QuizService quizService;
+    private final QuizInviteService quizInviteService;
 
-    public QuizController(QuizService quizService) {
+
+    public QuizController(QuizService quizService, QuizInviteService quizInviteService) {
         this.quizService = quizService;
+        this.quizInviteService = quizInviteService;
     }
 
     @PostMapping
     public ResponseEntity<QuizDTO> createQuiz(@Valid @RequestBody QuizDTO dto) {
         var created = quizService.createQuiz(dto);
+
+        quizInviteService.sendQuizInvites(created.getId());
+
         return ResponseEntity.ok(QuizMapper.toDto(created));
     }
 
@@ -36,8 +44,14 @@ public class QuizController {
 
     @GetMapping("/{id}")
     public ResponseEntity<QuizDTO> getOne(@PathVariable Long id) {
-        QuizDTO dto = quizService.getQuizById(id);
-        return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.notFound().build();
+        Quiz quiz = quizService.getQuizById(id);
+
+        if (quiz == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        QuizDTO dto = QuizMapper.toDto(quiz);
+        return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/{id}")
@@ -63,5 +77,4 @@ public class QuizController {
         quizService.deleteAllQuizzes();
         return ResponseEntity.ok("All quizzes have been deleted.");
     }
-
 }
