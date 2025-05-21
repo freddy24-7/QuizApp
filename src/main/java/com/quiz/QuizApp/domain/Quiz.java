@@ -30,14 +30,13 @@ public class Quiz {
 
     private Integer durationInSeconds;
 
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Question> questions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Participant> participants = new ArrayList<>();
 
     public boolean isClosed() {
         return Boolean.TRUE.equals(closed);
     }
-
 }
