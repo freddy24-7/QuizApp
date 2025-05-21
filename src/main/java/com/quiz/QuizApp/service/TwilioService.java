@@ -25,12 +25,15 @@ public class TwilioService {
     public void sendQuizInvites(List<String> phoneNumbers, Long quizId) {
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
 
+        // Remove trailing slash from FRONTEND_URL if present
+        String baseUrl = FRONTEND_URL.endsWith("/") ? FRONTEND_URL.substring(0, FRONTEND_URL.length() - 1) : FRONTEND_URL;
+
         // Loop through the list of phone numbers and send the SMS invite to each
         for (String phoneNumber : phoneNumbers) {
             // Prepare the message content with phone number included in the URL
             String messageBody = String.format(
                     "You've been invited to take a quiz! Click the link below to participate:\n\n%s/quiz/respond?quizId=%d&phoneNumber=%s",
-                    FRONTEND_URL,
+                    baseUrl,
                     quizId,
                     phoneNumber
             );
@@ -38,6 +41,7 @@ public class TwilioService {
             PhoneNumber to = new PhoneNumber(formatPhoneNumber(phoneNumber));
             PhoneNumber from = new PhoneNumber(TWILIO_PHONE_NUMBER);
 
+            // Send the SMS
             Message.creator(
                     to,
                     from,
@@ -47,10 +51,9 @@ public class TwilioService {
     }
 
     private String formatPhoneNumber(String phoneNumber) {
-        // This method formats the phone number to E.164 format (if necessary)
         if (phoneNumber.startsWith("0")) {
-            return "+31" + phoneNumber.substring(1);
+            return "+31" + phoneNumber.substring(1);  // Prepend the country code, assuming it's +31 for Netherlands
         }
-        return phoneNumber;
+        return phoneNumber; // Assuming it's already in E.164 format
     }
 }
