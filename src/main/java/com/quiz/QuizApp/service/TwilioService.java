@@ -25,19 +25,19 @@ public class TwilioService {
     public void sendQuizInvites(List<String> phoneNumbers, Long quizId) {
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
 
-        // Prepare the message content
-        String messageBody = String.format(
-                "You've been invited to take a quiz! Click the link below to participate:\n\n%s/quiz/respond?quizId=%d",
-                FRONTEND_URL,
-                quizId
-        );
-
         // Loop through the list of phone numbers and send the SMS invite to each
         for (String phoneNumber : phoneNumbers) {
+            // Prepare the message content with phone number included in the URL
+            String messageBody = String.format(
+                    "You've been invited to take a quiz! Click the link below to participate:\n\n%s/quiz/respond?quizId=%d&phoneNumber=%s",
+                    FRONTEND_URL,
+                    quizId,
+                    phoneNumber
+            );
+
             PhoneNumber to = new PhoneNumber(formatPhoneNumber(phoneNumber));
             PhoneNumber from = new PhoneNumber(TWILIO_PHONE_NUMBER);
 
-            // Send the SMS
             Message.creator(
                     to,
                     from,
@@ -47,6 +47,7 @@ public class TwilioService {
     }
 
     private String formatPhoneNumber(String phoneNumber) {
+        // This method formats the phone number to E.164 format (if necessary)
         if (phoneNumber.startsWith("0")) {
             return "+31" + phoneNumber.substring(1);
         }
