@@ -52,8 +52,8 @@ public class TwilioService {
 
     private String formatPhoneNumber(String phoneNumber) {
         if (phoneNumber.startsWith("0")) {
-            return "+31" + phoneNumber.substring(1);  // Prepend the country code, assuming it's +31 for Netherlands
+            return "+31" + phoneNumber.substring(1);
         }
-        return phoneNumber; // Assuming it's already in E.164 format
+        return phoneNumber;
     }
 }

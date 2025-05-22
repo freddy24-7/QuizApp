@@ -16,17 +16,17 @@ public class QuizDTO {
     @NotBlank(message = "Title is required")
     private String title;
 
-    @NotNull(message = "Duration in seconds is required")  // Ensure duration is not null
+    @NotNull(message = "Duration in seconds is required")
     private Integer durationInSeconds;
 
-    @NotNull(message = "Start time is required")  // Ensure start time is not null
+    @NotNull(message = "Start time is required")
     private LocalDateTime startTime;
 
-    private Boolean closed = false;  // Default to false if not provided
+    private Boolean closed = false;
 
-    @NotEmpty(message = "Quiz must contain at least one question")  // Ensure questions are not empty
+    @NotEmpty(message = "Quiz must contain at least one question")
     private List<QuestionDTO> questions;
 
-    private List<ParticipantDTO> participants;  // This can be empty, so no validation required
+    private List<ParticipantDTO> participants;
 
 }
